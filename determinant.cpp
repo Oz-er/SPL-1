@@ -50,7 +50,7 @@ int main(){
     for(int i=0;i<n;i++){     
         if(i==row)continue; 
         l=0;
-        for(int j=0;j<3;j++){
+        for(int j=0;j<n;j++){
             if(j==col)continue;
             v2[k][l]=v[i][j];
             l++;
@@ -95,4 +95,5 @@ int main(){
     //         cout<<v2[i][j]<<" ";
     //     }                                 
     //     cout<<endl;
+
     // }
