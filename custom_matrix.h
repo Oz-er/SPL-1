@@ -88,7 +88,7 @@ void setcolumn (std:: vector<std:: vector<double>> &m , std::vector<double> &v, 
 
 
 
-std::vector<std::vector<double>> mat_inverse(std::vector<std::vector<double>>&mat){
+std::vector<std::vector<double>> mat_inverse(std::vector<std::vector<double>>mat){
 
     //creating the identity
 
@@ -110,7 +110,30 @@ std::vector<std::vector<double>> mat_inverse(std::vector<std::vector<double>>&ma
 
     for(int i=0;i<size;i++){
 
+        //pivoting starts
+        int pivotRow = i;
+        double maxVal = std::abs(mat[i][i]);
+
+        for(int k=i+1; k<size; k++){
+            if(std::abs(mat[k][i]) > maxVal){
+                maxVal = std::abs(mat[k][i]);
+                pivotRow = k;
+            }
+        }
+
+        if(pivotRow != i){
+            std::swap(mat[i], mat[pivotRow]);
+            std::swap(idm[i], idm[pivotRow]);
+        }
+        
+        if(std::abs(mat[i][i]) < 1e-9){
+            std::cerr << "Warning: Matrix is singular or close to it!" << std::endl;
+        }
+
         double pivot = mat[i][i];
+
+
+        //pivoting ends
 
         //divide all with the diagonal
         for(int j=0;j<size;j++){
