@@ -1,11 +1,12 @@
 #include<iostream>
 #include<vector>
 #include<math.h>
+#include "custom_matrix.h"
 
 using namespace std;
 
-#define n 5
-#define iter 50
+#define n 150
+#define iter 1000
 
 
 double dotproduct(vector<double> &v1,vector<double> &v2){
@@ -40,14 +41,20 @@ vector<double> normalize(vector<double> &v){
 
     vector<double>v2(n);
 
+
+    // const double epsilon = 1e-10;
+    // if(norm < epsilon){
+    //     for(int i=0; i<n; i++) v2[i] = 0;
+    //     if(n > 0) v2[0] = 1.0;  // Make it a unit vector
+    //     return v2;
+    // }
+
     for(int i=0;i<n;i++){
         v2[i] = v[i]/norm;
     }
 
     return v2;
 }
-
-
 
 
 vector<double> subtract(vector<double> &first, vector<double> &second){
@@ -75,62 +82,6 @@ vector<double> proj (vector<double> &ground,vector<double> &v){
 }
 
 
-vector<double> getcolumn ( vector<vector<double>> &m , int col){
-    vector<double> v(n);
-
-    for(int i=0;i<n;i++){
-        v[i]=m[i][col];
-    }
-
-    return v;
-}
-
-
-vector<vector<double>> matmult(vector<vector<double>> &a,vector<vector<double>> &b){
-
-    vector<vector<double>> result(n,vector<double>(n));
-
-    for(int i=0;i<n;i++){
-        for(int j=0;j<n;j++){
-            double sum =0;
-            for(int k=0; k<n ; k++){
-                sum += a[i][k]*b[k][j];
-            }
-            result[i][j]=sum;
-        }
-    }
-
-    return result;
-}
-
-
-
-vector<double> getrow ( vector<vector<double>> &m , int row){
-    vector<double> v(n);
-
-    for(int i=0;i<n;i++){
-        v[i]=m[row][i];
-    }
-
-    return v;
-}
-
-
-
-
-
-
-void setcolumn ( vector<vector<double>> &m , vector<double> &v, int col){
-    
-
-    for(int i=0;i<n;i++){
-        m[i][col] = v[i];
-    }
-
-
-}
-
-
 void qr_decmopose ( vector<vector<double>>&a ,vector<vector<double>>&q ,vector<vector<double>>&r ){
     q=a;
 
@@ -140,6 +91,9 @@ void qr_decmopose ( vector<vector<double>>&a ,vector<vector<double>>&q ,vector<v
             r[i][j]=0;
         }
     }
+
+    // //check for near 0 values
+    // const double epsilon = 1e-10;
 
     //iterating through the column
 
@@ -152,6 +106,10 @@ void qr_decmopose ( vector<vector<double>>&a ,vector<vector<double>>&q ,vector<v
 
         //diagonal of r will be the norms
         r[i][i] = eclnorm(q_i);
+
+        // if(r[i][i] < epsilon){
+        //     continue;
+        // }
 
         //setting the unit vector
         q_i = normalize(q_i);
