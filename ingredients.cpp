@@ -162,8 +162,9 @@ int main(){
     auto tmp =matmult(H,K);
     auto kc = matmult(tmp,H); 
 
-    auto W = weighting_mat(K,source,target);
-
+    auto L = weighting_mat(K,source,target);
+    auto tmp2 = matmult(K,L);
+    auto kl = matmult(tmp2,K);
    
 
     cout<<"Stacked matrix: "<<endl;
@@ -205,7 +206,7 @@ int main(){
     cout<<"Weight matrix: "<<endl;
     for(int i=0;i<m;i++){
         for(int j=0;j<m;j++){
-            cout<<W[i][j]<<" ";
+            cout<<kl[i][j]<<" ";
         }
         cout<<endl;
     }
