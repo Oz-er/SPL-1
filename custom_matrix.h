@@ -34,7 +34,7 @@ std::vector<double> getcolumn (std::vector<std::vector<double>> &m , int col){
 
 
 //for square matrices only
-std::vector<std::vector<double>> matmult(std::vector<std::vector<double>> &a,std::vector<std::vector<double>> &b){
+std::vector<std::vector<double>> matmult(const std::vector<std::vector<double>> &a,const std::vector<std::vector<double>> &b){
 
     int n = a.size();
     std::vector<std::vector<double>> result(n,std::vector<double>(n));
@@ -83,9 +83,20 @@ void setcolumn (std:: vector<std:: vector<double>> &m , std::vector<double> &v, 
 }
 
 
+std::vector<std::vector<double>>matadd(std::vector<std::vector<double>> &a,std::vector<std::vector<double>> &b){
+    int rows=a.size();
+    int cols=a[0].size();
 
+    std::vector<std::vector<double>> result(rows,std::vector<double>(cols));
 
+    for(int i=0;i<rows;i++){
+        for(int j=0;j<cols;j++){
+            result[i][j]=a[i][j] + b[i][j];
+        }
+    }
 
+    return result;
+}
 
 
 std::vector<std::vector<double>> mat_inverse(std::vector<std::vector<double>>mat){
@@ -127,7 +138,7 @@ std::vector<std::vector<double>> mat_inverse(std::vector<std::vector<double>>mat
         }
         
         if(std::abs(mat[i][i]) < 1e-9){
-            std::cerr << "Warning: Matrix is singular or close to it!" << std::endl;
+            std::cerr << "Warning: Matrix is singular or close to it" << std::endl;
         }
 
         double pivot = mat[i][i];
@@ -135,7 +146,7 @@ std::vector<std::vector<double>> mat_inverse(std::vector<std::vector<double>>mat
 
         //pivoting ends
 
-        //divide all with the diagonal
+        //divide all with the pivot(dividing by a large pivot keeps the error shrunk)
         for(int j=0;j<size;j++){
             mat[i][j] /= pivot;
             idm[i][j] /= pivot;
