@@ -436,13 +436,56 @@ vector<vector<double>> weighting_mat(vector<vector<double>>&kernel ,vector<vecto
 
 
 
+double calculate_mmd(vector<vector<double>>&data, int source_rows, int target_rows){
+    
+
+    int dimensions = data[0].size();
+
+    vector<double> mean_s(dimensions,0.0);
+    vector<double> mean_t(dimensions,0.0);
+
+    for(int i=0;i<source_rows;i++){
+        for(int j=0;j<dimensions;j++){
+            mean_s[j]+=data[i][j];
+        }
+    }
+
+    for(int j=0;j<dimensions;j++){
+        mean_s[j]/=source_rows;
+    }
+
+
+    for(int i=source_rows;i<source_rows+target_rows;i++){
+        for(int j=0;j<dimensions;j++){
+            mean_t[j]+=data[i][j];
+        }
+    }
+
+    for(int j=0;j<dimensions;j++){
+        mean_t[j]/=target_rows;
+    }
+
+
+    double dist_sq=0.0;
+
+    for(int j=0; j<dimensions;j++){
+        dist_sq += pow(mean_s[j]-mean_t[j],2);
+    }
+
+    return sqrt(dist_sq);
+
+
+}
+
+
 
 
 
 
 int main(){
 
-    
+    cout<<"hello"<<endl;
+
     vector<vector<double>> source;
     vector<vector<double>> target;
 
@@ -450,17 +493,27 @@ int main(){
     vector<int>target_labels;
 
 
-    string filename = "S.csv";
+    string filename = "Z.csv";
     load_dataset(filename,source,source_labels);
 
 
-    string filename2 = "Z.csv";
+    string filename2 = "S.csv";
     load_dataset(filename2,target,target_labels);
 
-    z_score_normalize(source);
-    z_score_normalize(target);
 
     auto stk=stacking(source,target); //20*10
+
+    z_score_normalize(stk);
+
+    cout<<"before mmd"<<endl;
+
+    double mmd_before = calculate_mmd(stk,source.size(),target.size());
+    cout << "\n------------------------------------------------" << endl;
+    cout << "MMD Distance (Original Data): " << mmd_before << endl;
+    cout << "------------------------------------------------" << endl;
+
+    cout<<"after mmd"<<endl;
+
     auto K=kernel(stk); //(20*10).(10*20)=(20*20) 
 
     int m = K.size();
@@ -538,8 +591,13 @@ int main(){
 
     auto W = matmult(mat_inverse(distance),structure);
 
+    cout<<"1 done"<<endl;
+
     auto eigen_pairs = eigen_starter(W); 
     eigen_pairs = pair_sort(eigen_pairs);
+
+
+    cout<<"2 done"<<endl;
 
 
     // for(int i=0;i<eigen_pairs.size();i++){
@@ -559,23 +617,34 @@ int main(){
     }
 
 
-    // int m = K.size(); // Total samples (Source + Target)
-    // vector<vector<double>>W_matrix(m,vector<double>(dim));
+    m = K.size(); // Total samples (Source + Target)
+    vector<vector<double>>W_matrix(m,vector<double>(dim));
     
-    // for(int i=0;i<m;i++){
-    //     for(int j=0;j<dim;j++){
-    //         W_matrix[i][j]=eigen_pairs[j].second[i];
-    //     }
-    // }
+    for(int i=0;i<m;i++){
+        for(int j=0;j<dim;j++){
+            W_matrix[i][j]=eigen_pairs[j].second[i];
+        }
+    }
 
-    // auto Z = matmult(K,W_matrix);
+    auto Z = matmult(K,W_matrix);
 
-
-
-
+    cout<<"3 done"<<endl;
 
 
-    
+
+    double mmd_after = calculate_mmd(Z,source.size(),target.size());
+    cout << "\n------------------------------------------------" << endl;
+    cout << "MMD Distance (Projected Data): " << mmd_after << endl;
+    cout << "------------------------------------------------" << endl;  
+
+
+
+    cout<<"4 done"<<endl;
+
+
+
+
+
 
 
 
