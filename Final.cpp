@@ -493,11 +493,11 @@ int main(){
     vector<int>target_labels;
 
 
-    string filename = "Z.csv";
+    string filename = "S.csv";
     load_dataset(filename,source,source_labels);
 
 
-    string filename2 = "S.csv";
+    string filename2 = "Z.csv";
     load_dataset(filename2,target,target_labels);
 
 
@@ -610,11 +610,11 @@ int main(){
     // }
 
 
-    vector<vector<double>>top_eigenvectors;
+    // vector<vector<double>>top_eigenvectors;
 
-    for(int i=0;i<dim;i++){
-        top_eigenvectors.push_back(eigen_pairs[i].second);
-    }
+    // for(int i=0;i<dim;i++){
+    //     top_eigenvectors.push_back(eigen_pairs[i].second);
+    // }
 
 
     m = K.size(); // Total samples (Source + Target)
@@ -625,10 +625,11 @@ int main(){
             W_matrix[i][j]=eigen_pairs[j].second[i];
         }
     }
+    cout<<"3 done"<<endl;
 
     auto Z = matmult(K,W_matrix);
 
-    cout<<"3 done"<<endl;
+    cout<<"4 done"<<endl;
 
 
 
@@ -639,7 +640,7 @@ int main(){
 
 
 
-    cout<<"4 done"<<endl;
+    cout<<"5 done"<<endl;
 
 
 
