@@ -44,9 +44,9 @@ void load_dataset(string filename, vector<vector<double>> &X, vector<int> &Y) {
 double get_distance(vector<double> &v1, vector<double> &v2){
 
     double sum = 0.0;
-    int dim = v1.size();
+    int cols = v1.size();
 
-    for(int i=0; i<dim;i++){
+    for(int i=0; i<cols;i++){
         double diff= v1[i]-v2[i];
         sum+=diff*diff;
     }
@@ -79,22 +79,17 @@ int knn_predict(vector<vector<double>> &train, vector<int>&train_labels, vector<
 
     int vote0 = 0;
     int vote1 = 0;
+for (int i = 0; i < k; i++) {
+        int neighbor_index = distances[i].first;
+        int label = train_labels[neighbor_index];
 
-    int source_label = train_labels[distances[0].first];
-
-    if(source_label == 0){
-        vote0++;
-    }
-    else{
-        vote1++;
+        if (label == 0) vote0++;
+        else vote1++;
     }
 
-    if(vote1>vote0){
-        return 1;
-    }
-    else{
-        return 0;
-    }
+    // 4. Majority Rule
+    if (vote1 > vote0) return 1;
+    else return 0;
 
 }
 
