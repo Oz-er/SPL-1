@@ -33,16 +33,21 @@ std::vector<double> getcolumn (std::vector<std::vector<double>> &m , int col){
 
 
 
-//for square matrices only
 std::vector<std::vector<double>> matmult(const std::vector<std::vector<double>> &a,const std::vector<std::vector<double>> &b){
 
-    int n = a.size();
-    std::vector<std::vector<double>> result(n,std::vector<double>(n));
+    if(a.empty() || b.empty())return{};
 
-    for(int i=0;i<n;i++){
-        for(int j=0;j<n;j++){
+    int rows_a = a.size();
+    int cols_a = a[0].size();
+    int cols_b = b[0].size();
+
+    // int n = a.size();
+    std::vector<std::vector<double>> result(rows_a,std::vector<double>(cols_b,0.0));
+
+    for(int i=0;i<rows_a;i++){
+        for(int j=0;j<cols_b;j++){
             double sum =0;
-            for(int k=0; k<n ; k++){
+            for(int k=0; k<cols_a;k++){
                 sum += a[i][k]*b[k][j];
             }
             result[i][j]=sum;
