@@ -539,13 +539,63 @@ int knn_predict(vector<vector<double>> &train, vector<int>&train_labels, vector<
 
 }
 
+double get_knn_prob(vector<vector<double>> &train, vector<int>&train_labels, vector<double>&test_sample, int k){
+
+    vector<pair<int,double>>distances;
+
+    int train_rows = train.size();
+
+    for (int i = 0; i < train_rows; i++) {
+        double d = get_distance(train[i],test_sample);
+        distances.push_back({i,d});
+    }
+
+    sort(distances.begin(),distances.end(),compareDist);
+
+    int vote1 = 0;
+
+    for(int i=0;i<k;i++){
+        int neighbor_index = distances[i].first;
+
+        if(train_labels[neighbor_index]==1){
+            vote1++;
+        }
+    }
+
+    return (double)vote1/k;
+
+}
 
 
+double calculate_auc(vector<double>&probs,vector<int>&actual_labels){
+
+    vector<double>pos_scores;
+    vector<double>neg_scores;
+
+    for(int i = 0; i < probs.size(); i++) {
+        if(actual_labels[i] == 1) pos_scores.push_back(probs[i]);
+        else neg_scores.push_back(probs[i]);
+    }
+    
+    if(pos_scores.empty() || neg_scores.empty()) return 0.0;
+
+    double valid_pairs = 0.0;
+    double total_pairs = 0.0;
+
+    // Compare every Positive vs Negative sample
+    for(double p_score : pos_scores) {
+        for(double n_score : neg_scores) {
+            total_pairs++;
+            if(p_score > n_score) valid_pairs += 1.0;       // Correct ranking (Bug score > Clean score)
+            else if(p_score == n_score) valid_pairs += 0.5; // Tie
+        }
+    }
+
+    return valid_pairs / total_pairs;
+}
 
 
-
-
-
+  
 int main(){
 
     cout<<"hello"<<endl;
@@ -557,11 +607,11 @@ int main(){
     vector<int>target_labels;
 
 
-    string filename = "A.csv";
+    string filename = "S.csv";
     load_dataset(filename,source,source_labels);
 
 
-    string filename2 = "S.csv";
+    string filename2 ="Z.csv";
     load_dataset(filename2,target,target_labels);
 
 
@@ -655,13 +705,13 @@ int main(){
 
     auto W = matmult(mat_inverse(distance),structure);
 
-    cout<<"1 done"<<endl;
+    // cout<<"1 done"<<endl;
 
     auto eigen_pairs = eigen_starter(W); 
     eigen_pairs = pair_sort(eigen_pairs);
 
 
-    cout<<"2 done"<<endl;
+    // cout<<"2 done"<<endl;
 
 
     // for(int i=0;i<eigen_pairs.size();i++){
@@ -697,10 +747,10 @@ int main(){
 
 
 
-    // double mmd_after = calculate_mmd(Z,source.size(),target.size());
-    // cout << "\n------------------------------------------------" << endl;
-    // cout << "MMD Distance (Projected Data): " << mmd_after << endl;
-    // cout << "------------------------------------------------" << endl;  
+    double mmd_after = calculate_mmd(Z,source.size(),target.size());
+    cout << "\n------------------------------------------------" << endl;
+    cout << "MMD Distance (Projected Data): " << mmd_after << endl;
+    cout << "------------------------------------------------" << endl;  
 
 
 
@@ -718,7 +768,7 @@ int main(){
         test.push_back(Z[i]);
     }
 
-    int k_neighbors=3;
+    int k_neighbors=1;
 
 
 
@@ -728,11 +778,15 @@ int main(){
     int false_neg =0;
 
 
+    vector<double> prob_scores; // Store probabilities for AUC  
+
     for(int i=0;i<test.size();i++){
         int actual = target_labels[i];
 
         int predicted = knn_predict(train,source_labels,test[i],k_neighbors);
-
+    // 2. Get Probability Score (for AUC) 
+        double prob = get_knn_prob(train, source_labels, test[i], k_neighbors);
+        prob_scores.push_back(prob);
         if(predicted==1 && actual ==1)true_pos++;
         if(predicted==0 && actual ==0)true_neg++;
         if(predicted==1 && actual ==0)false_pos++;
@@ -748,20 +802,18 @@ int main(){
     double recall = (true_pos + false_neg) > 0 ? (double)true_pos / (true_pos + false_neg) : 0.0;
     double f1 = (precision + recall) > 0 ? 2.0 * (precision * recall) / (precision + recall) : 0.0;
 
+    double auc = calculate_auc(prob_scores, target_labels);
+
     cout << "------------------------------------------------" << endl;
     cout << "FINAL RESULTS (TCA + KNN)" << endl;
-    cout << "------------------------------------------------" << endl;
-    cout << "True Positives (Caught Bugs): " << true_pos << endl;
-    cout << "False Negatives (Missed Bugs): " << false_neg << endl;
     cout << "------------------------------------------------" << endl;
     cout << "Accuracy:  " << accuracy << "%" << endl;
     cout << "Precision: " << precision << endl;
     cout << "Recall:    " << recall << endl;
     cout << "F1-Score:  " << f1 << endl;
+    cout << "AUC:       " << auc << endl; // Print AUC
     cout << "------------------------------------------------" << endl;
-
-
-    cout<<"5 done"<<endl;
+    // cout<<"5 done"<<endl;
 
 
 
