@@ -440,11 +440,105 @@ vector<vector<double>> weighting_mat(vector<vector<double>>&kernel ,vector<vecto
 
 
 
+
 vector<vector<double>> conditional_weighting_mat(int total_samples,int ns, int nt , 
                                                 vector<int>&source_labels,
-                                                vector<int>&target_pseudo_labels,)
+                                                vector<int>&target_pseudo_labels,
+                                                int class_label){
 
 
+    vector<vector<double>> Mc(total_samples,vector<double>(total_samples,0.0));
+    
+
+    int source_samples_inthis_class =0;
+    int target_samples_inthis_class =0;
+
+
+    for(int i=0;i<ns;i++){
+        if(source_labels[i]==class_label){
+            source_samples_inthis_class++;
+        }
+    }
+
+    for(int i=0;i<ns;i++){
+        if(target_pseudo_labels[i]==class_label){
+            target_samples_inthis_class++;
+        }
+    }
+
+
+    
+
+    if(source_samples_inthis_class==0 || target_samples_inthis_class==0){
+        return Mc;
+    }
+
+
+
+
+    for(int i=0;i<total_samples;i++){
+        for(int j=0;j<total_samples;j++){
+            
+            bool i_is_in_class = false;
+            if(i<ns){
+                if(source_labels[i]==class_label){
+                    i_is_in_class = true;
+                }
+            }
+            else{
+                if(target_pseudo_labels[i-ns]==class_label){
+                    i_is_in_class=true;
+                }
+            }
+
+
+
+            bool j_is_in_class = false;
+            if(j<ns){
+                if(source_labels[j]==class_label){
+                    j_is_in_class = true;
+                }
+            }
+            else{
+                if(target_pseudo_labels[j-ns]==class_label){
+                    j_is_in_class=true;
+                }
+            }
+
+
+
+
+
+
+
+            if(i_is_in_class && j_is_in_class){
+                if(i<ns && j<ns){
+                    Mc[i][j] = 1.00/(source_samples_inthis_class*source_samples_inthis_class);
+                }
+
+                else if(i>=ns && j>=ns){
+                    Mc[i][j] = 1.00/(target_samples_inthis_class*target_samples_inthis_class);
+                }
+
+                else{
+                    Mc[i][j] = -1.00/(source_samples_inthis_class*target_samples_inthis_class);
+                }   
+            }
+
+            
+
+
+        }
+    }
+
+
+    return Mc;
+
+
+
+
+
+    }
 
 
 
