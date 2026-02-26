@@ -1,0 +1,43 @@
+Gemini said
+The choice between a balance factor (μ) of 0.5 versus 0.1 comes down to how much you trust your initial "guesses" (pseudo-labels) and the specific nature of the datasets you are working with.
+
+When you set μ=0.5, you are actually running an algorithm called JDA (Joint Distribution Adaptation). The creators of JDA assumed that both the global distribution and the class-specific distributions are equally important, treating them equally.
+
+Balanced Distribution Adaptation (BDA) was created specifically because researchers realized that forcing μ=0.5 every time was a flaw, and adjusting the relative importance of marginal and conditional distributions solves this issue.
+
+Here is why you would choose one over the other:
+
+1. Why use μ=0.5 (The "Equal Trust" Baseline)
+
+The Math: 0.5×M0+0.5×Mc
+​	
+ 
+
+What it means: You are saying, "I care equally about aligning the overall projects AND aligning the specific bugs to bugs."
+
+When to use it: This is the standard starting point. If your 1-NN "Cold Start" prediction is reasonably decent (e.g., 60%+ accurate), you can trust the Conditional Matrix (Mc) enough to give it a 50% vote in the final alignment.
+
+2. Why use μ=0.1 (The "Skeptical" Approach)
+
+The Math: 0.9×M0+0.1×Mc
+​	
+ 
+
+What it means: You are giving 90% of the power to the overall global shape (M0)
+and only 10% of the power to the class-specific alignment (Mc).
+
+When to use it: You use a low μ when the Source and Target datasets are so vastly different that your initial 1-NN "Cold Start" is terrible (e.g., predicting 90% of the target data as "Clean" incorrectly).
+
+If your pseudo-labels are mostly wrong, Mc
+​will be built on lies (it will try to align Apache bugs with Zxing clean files).
+
+By setting μ=0.1, you tell the math: "My labels are probably garbage right now, so mostly ignore them. Just focus on making the overall datasets overlap first." ### 3. The "Ideal" Approach: Grid Search
+In professional research, you rarely just pick 0.5 or 0.1 and publish the paper. BDA highly relies on the balance factor (μ) to adjust the importance.
+
+Instead, researchers run a Grid Search. They run the entire BDA loop 10 times, testing μ=0.1, then μ=0.2, all the way up to μ=0.9, and report the one that yields the highest AUC.
+
+If μ turns out to be high (e.g., 0.8): It means the global structures were already pretty similar, but the classes were heavily shifted.
+
+If μ turns out to be low (e.g., 0.2): It means the global structures were drastically different, and the algorithm needed to spend most of its energy just getting the clouds to overlap.
+
+For your code right now: Starting with μ=0.5 is the best way to verify your code is working. Once the loop runs successfully without crashing, you can experiment with changing it to 0.1 or 0.9 to see how it affects your final AUC score!
