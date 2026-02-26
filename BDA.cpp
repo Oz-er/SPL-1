@@ -460,7 +460,7 @@ vector<vector<double>> conditional_weighting_mat(int total_samples,int ns, int n
         }
     }
 
-    for(int i=0;i<ns;i++){
+    for(int i=0;i<nt;i++){
         if(target_pseudo_labels[i]==class_label){
             target_samples_inthis_class++;
         }

@@ -33,6 +33,21 @@ std::vector<double> getcolumn (std::vector<std::vector<double>> &m , int col){
 
 
 
+std::vector<std::vector<double>> mat_scalar_mult(std::vector<std::vector<double>> &mat, double scalar){
+    int rows = mat.size();
+    int cols = mat[0].size();
+    std::vector<std::vector<double>> result(rows,std::vector<double>(cols));
+
+    for(int i=0;i<rows;i++){
+        for(int j=0;j<cols;j++){
+            result[i][j] = mat[i][j] * scalar;
+        }
+    }
+    return result;
+}
+
+
+
 std::vector<std::vector<double>> matmult(const std::vector<std::vector<double>> &a,const std::vector<std::vector<double>> &b){
 
     if(a.empty() || b.empty())return{};
