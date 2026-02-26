@@ -717,11 +717,11 @@ int main(){
     vector<int>target_labels;
 
 
-    string filename = "S.csv";
+    string filename = "Z.csv";
     load_dataset(filename,source,source_labels);
 
 
-    string filename2 ="Z.csv";
+    string filename2 ="S.csv";
     load_dataset(filename2,target,target_labels);
 
 
@@ -746,9 +746,10 @@ int main(){
     auto tmp =matmult(H,K);
     auto kc = matmult(tmp,H); 
 
-    auto L = weighting_mat(K,source,target);
-    auto tmp2 = matmult(K,L);
-    auto kl = matmult(tmp2,K);
+    // auto L = weighting_mat(K,source,target);
+    // auto tmp2 = matmult(K,L);
+    // auto kl = matmult(tmp2,K);
+    //see line 800
 
     vector<vector<double>>muI(m,vector<double>(m));
 
@@ -762,174 +763,113 @@ int main(){
     
    
 
-    // cout<<"Stacked matrix: "<<endl;
-    // for(int i=0;i<stk.size();i++){
-    //     for(int j=0;j<stk[0].size();j++){
-    //         cout<<stk[i][j]<<" ";
-    //     }
-    //     cout<<endl;
-    // }
 
-    // cout<<endl;
+//---------BDA SETUP-------------
 
 
-
-    // cout<<"Kernel matrix: "<<endl;
-    // for(int i=0;i<m;i++){
-    //     for(int j=0;j<m;j++){
-    //         cout<<K[i][j]<<" ";
-    //     }
-    //     cout<<endl;
-    // }
-
-    // cout<<endl;
+    double mu = 0.5;
+    int iterations = 10;
 
 
+    vector<int>pseudo_labels;
 
-    // cout<<"Centering matrix: "<<endl;
-    // for(int i=0;i<m;i++){
-    //     for(int j=0;j<m;j++){
-    //         cout<<kc[i][j]<<" ";
-    //     }
-    //     cout<<endl;
-    // }
+    for(int i=0;i<target.size();i++){
+        int pred = knn_predict(source,source_labels,target[i],1);
+        pseudo_labels.push_back(pred);
+    }
 
-    // cout<<endl;
+    auto M0 = weighting_mat(K,source,target);
+
+    vector<vector<double>> Z; 
+    vector<vector<double>> train_data;
+    vector<vector<double>> test_data;
+
+
+    for(int itr=0;itr<iterations;itr++){
+
+        auto Mc_clean = conditional_weighting_mat(m,source.size(),target.size(),source_labels,pseudo_labels,0);
+        auto Mc_buggy = conditional_weighting_mat(m,source.size(),target.size(),source_labels,pseudo_labels,1);
 
 
 
-    // cout<<"Weight matrix: "<<endl;
-    // for(int i=0;i<m;i++){
-    //     for(int j=0;j<m;j++){
-    //         cout<<kl[i][j]<<" ";
-    //     }
-    //     cout<<endl;
-    // }
-
-    // cout<<endl;
+        auto Mc_combined = matadd(Mc_clean, Mc_buggy);
+        auto part1 = mat_scalar_mult(M0, 1.0-mu);
+        auto part2 = mat_scalar_mult(Mc_combined, mu);
+        auto M_final = matadd(part1, part2);
 
 
-    auto distance = matadd(kl,muI);
-    auto structure = kc;
+        auto tmp2 = matmult(K,M_final);
+        auto kl = matmult(tmp2,K);
 
 
-    auto W = matmult(mat_inverse(distance),structure);
+        auto distance = matadd(kl, muI);
+        auto structure = kc; // kc was calculated above the loop!
+        auto W = matmult(mat_inverse(distance), structure);
 
-    // cout<<"1 done"<<endl;
+        auto eigen_pairs = eigen_starter(W); 
+        eigen_pairs = pair_sort(eigen_pairs);
 
-    auto eigen_pairs = eigen_starter(W); 
-    eigen_pairs = pair_sort(eigen_pairs);
-
-
-    // cout<<"2 done"<<endl;
-
-
-    // for(int i=0;i<eigen_pairs.size();i++){
-    //     cout<<"value: "<<eigen_pairs[i].first<<" "<<endl;
-
-    //     for(int j=0;j<eigen_pairs[i].second.size();j++){
-    //         cout<<"vector: "<<eigen_pairs[i].second[j]<<" ";
-    //     }
-    //     cout<<endl;
-    // }
-
-
-    // vector<vector<double>>top_eigenvectors;
-
-    // for(int i=0;i<dim;i++){
-    //     top_eigenvectors.push_back(eigen_pairs[i].second);
-    // }
-
-
-    m = K.size(); // Total samples (Source + Target)
-    vector<vector<double>>W_matrix(m,vector<double>(dim));
-    
-    for(int i=0;i<m;i++){
-        for(int j=0;j<dim;j++){
-            W_matrix[i][j]=eigen_pairs[j].second[i];
+        vector<vector<double>> W_matrix(m, vector<double>(dim));
+        for(int i=0; i<m; i++){
+            for(int j=0; j<dim; j++){
+                W_matrix[i][j] = eigen_pairs[j].second[i];
+            }
         }
-    }
-    cout<<"3 done"<<endl;
 
-    auto Z = matmult(K,W_matrix);
+        // d. Project the data
+        Z = matmult(K, W_matrix);
 
-    // cout<<"4 done"<<endl;
+        // e. Split Z back into Train and Test
+        train_data.clear();
+        test_data.clear();
+        for(int i=0; i<source.size(); i++) train_data.push_back(Z[i]);
+        for(int i=source.size(); i<Z.size(); i++) test_data.push_back(Z[i]);
 
-
-
-    double mmd_after = calculate_mmd(Z,source.size(),target.size());
-    cout << "\n------------------------------------------------" << endl;
-    cout << "MMD Distance (Projected Data): " << mmd_after << endl;
-    cout << "------------------------------------------------" << endl;  
-
-
-
-    
-    vector<vector<double>>train;
-    vector<vector<double>>test;
-
-
-
-    for(int i=0;i<source.size();i++){
-        train.push_back(Z[i]);
+        // f. Update Pseudo-Labels for the NEXT iteration
+        for(int i=0; i<test_data.size(); i++){
+            pseudo_labels[i] = knn_predict(train_data, source_labels, test_data[i], 1);
+        }
+        
+        cout << "Completed BDA Iteration: " << itr+1 << endl;
     }
 
-    for(int i=source.size();i<source.size()+target.size();i++){
-        test.push_back(Z[i]);
-    }
+    // --- FINAL EVALUATION ---
+    int true_pos = 0, true_neg = 0, false_pos = 0, false_neg = 0;
+    vector<double> prob_scores; 
 
-    int k_neighbors=1;
-
-
-
-    int true_pos =0;
-    int true_neg =0;
-    int false_pos =0;
-    int false_neg =0;
-
-
-    vector<double> prob_scores; // Store probabilities for AUC  
-
-    for(int i=0;i<test.size();i++){
+    // Test using the FINAL latents space (Z) after 10 iterations
+    for(int i=0; i<test_data.size(); i++){
         int actual = target_labels[i];
-
-        int predicted = knn_predict(train,source_labels,test[i],k_neighbors);
-    // 2. Get Probability Score (for AUC) 
-        double prob = get_knn_prob(train, source_labels, test[i], k_neighbors);
+        
+        // Using k=3 for final evaluation 
+        int predicted = knn_predict(train_data, source_labels, test_data[i], 3);
+        double prob = get_knn_prob(train_data, source_labels, test_data[i], 3);
+        
         prob_scores.push_back(prob);
-        if(predicted==1 && actual ==1)true_pos++;
-        if(predicted==0 && actual ==0)true_neg++;
-        if(predicted==1 && actual ==0)false_pos++;
-        if(predicted==0 && actual ==1)false_neg++;
+
+        if(predicted==1 && actual==1) true_pos++;
+        if(predicted==0 && actual==0) true_neg++;
+        if(predicted==1 && actual==0) false_pos++;
+        if(predicted==0 && actual==1) false_neg++;
     }
 
-
-    // 3. Calculate Metrics
-    double accuracy = (double)(true_pos + true_neg) / test.size() * 100.0;
-    
-    // Prevent division by zero
+    double accuracy = (double)(true_pos + true_neg) / test_data.size() * 100.0;
     double precision = (true_pos + false_pos) > 0 ? (double)true_pos / (true_pos + false_pos) : 0.0;
     double recall = (true_pos + false_neg) > 0 ? (double)true_pos / (true_pos + false_neg) : 0.0;
     double f1 = (precision + recall) > 0 ? 2.0 * (precision * recall) / (precision + recall) : 0.0;
-
     double auc = calculate_auc(prob_scores, target_labels);
 
     cout << "------------------------------------------------" << endl;
-    cout << "FINAL RESULTS (TCA + KNN)" << endl;
+    cout << "FINAL RESULTS (BDA + KNN)" << endl;
     cout << "------------------------------------------------" << endl;
     cout << "Accuracy:  " << accuracy << "%" << endl;
     cout << "Precision: " << precision << endl;
     cout << "Recall:    " << recall << endl;
     cout << "F1-Score:  " << f1 << endl;
-    cout << "AUC:       " << auc << endl; // Print AUC
+    cout << "AUC:       " << auc << endl;
     cout << "------------------------------------------------" << endl;
-    // cout<<"5 done"<<endl;
 
-
-
-
-
-
+    return 0; // End of main()
 
 
 }

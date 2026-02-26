@@ -1,0 +1,29 @@
+omermahboob@Omers-MacBook-Air SPL-1 % cd "/Users/omermahboob/SPL-1
+/" && g++ BDA.cpp -o BDA && "/Users/omermahboob/SPL-1/"BDA
+hello
+before mmd
+
+------------------------------------------------
+MMD Distance (Original Data): 2.87293
+------------------------------------------------
+after mmd
+Completed BDA Iteration: 1
+Completed BDA Iteration: 2
+Completed BDA Iteration: 3
+Completed BDA Iteration: 4
+Completed BDA Iteration: 5
+Completed BDA Iteration: 6
+Completed BDA Iteration: 7
+Completed BDA Iteration: 8
+Completed BDA Iteration: 9
+Completed BDA Iteration: 10
+------------------------------------------------
+FINAL RESULTS (BDA + KNN)
+------------------------------------------------
+Accuracy:  60.7143%
+Precision: 0.5
+Recall:    0.181818
+F1-Score:  0.266667
+AUC:       0.608289
+------------------------------------------------
+omermahboob@Omers-MacBook-Air SPL-1 % 
