@@ -74,6 +74,23 @@ std::vector<std::vector<double>> matmult(const std::vector<std::vector<double>> 
 
 
 
+std::vector<std::vector<double>>  transpose(std::vector<std::vector<double>> &mat){
+    int rows=mat.size();
+    int cols=mat[0].size();
+
+    std::vector<std::vector<double>> result(rows,std::vector<double>(cols));
+
+    for(int i=0;i<rows;i++){
+        for(int j=0;j<cols;j++){
+            result[j][i]=mat[i][j];
+        }
+    }
+
+    return result;
+}
+
+
+
 
 
 std::vector<double> getrow (std::vector<std::vector<double>> &m , int row){
@@ -189,6 +206,28 @@ std::vector<std::vector<double>> mat_inverse(std::vector<std::vector<double>>mat
 
     return idm ;
 
+}
+
+
+
+
+
+
+
+
+std::vector<std::vector<double>>  transpose(std::vector<std::vector<double>> &mat){
+    int rows=mat.size();
+    int cols=mat[0].size();
+
+    std::vector<std::vector<double>> result(rows,std::vector<double>(cols));
+
+    for(int i=0;i<rows;i++){
+        for(int j=0;j<cols;j++){
+            result[j][i]=mat[i][j];
+        }
+    }
+
+    return result;
 }
 
 
