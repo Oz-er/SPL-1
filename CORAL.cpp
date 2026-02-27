@@ -417,10 +417,6 @@ vector<vector<double>> mat_power  (vector<vector<double>> &m,  double power){
     //note down the formula before proceeding 
 
 
-
-
-
-
 }
 
 
