@@ -386,11 +386,11 @@ vector<vector<double>> get_covariance(vector<vector<double>> &m){
 
 
 
-
-
-
-
-
+//mat mat_power = U*D*U^T
+//U = eigenvctors stored in column
+//D = power*identity matrix(diagonal matrix with the eigenvalue 
+//raised to the power as the only value)
+//U^T = Transpose of U
 vector<vector<double>> mat_power  (vector<vector<double>> &m,  double power){
 
     int rows = m.size();
@@ -398,24 +398,44 @@ vector<vector<double>> mat_power  (vector<vector<double>> &m,  double power){
 
 
     auto eigs = eigen_starter(m);
-    vector<vector<double>> eig_vectors;
-    vector<double> eig_values;
+    vector<vector<double>> U(rows,vector<double>(cols));
+    vector<double> eig_values(rows);
     
-    for(int  i=0;i<eigs.size();i++){
-    eig_values.push_back(eigs[i].first);
-    eig_vectors.push_back(eigs[i].second);
+    for(int  i=0;i<rows;i++){
+    for(int j=0;j<cols;j++){
+    U[i][j]=eigs[j].second[i];
+    }
     }
 
 
-    vector<vector<double>> idt;
-
-    for(int  i=0;i<eigs.size();i++){
-        
-        
+    for(int i=0;i<rows;i++){
+    eig_values[i]=eigs[i].first;
     }
 
-    //note down the formula before proceeding 
 
+
+    auto U_T = transpose(U);
+
+
+
+    vector<vector<double>> D(rows,vector<double>(cols,0.0));
+    for(int i=0;i<rows;i++){
+    for(int j=0;j<cols;j++){
+    if(i==j){
+    if(eig_values[i]>0.0){
+    D[i][j]=pow((eig_values[i]),power);
+    }
+    }
+    }
+    }
+
+
+
+    vector<vector<double>> res(rows,vector<double>(cols));
+    res = matmult(U,D);
+    res = matmult(res,U_T);
+
+    return res;
 
 }
 
