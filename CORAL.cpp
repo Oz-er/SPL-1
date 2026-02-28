@@ -367,8 +367,8 @@ vector<vector<double>> get_covariance(vector<vector<double>> &m){
 
     // Covariance = (X_c^T * X_c) / (n - 1)
     auto m_centered_transpose = transpose(m_centered);
-    auto cov = matmult(m_centered_transpose,m_centered);
-    for(int i=0;i<rows;i++){
+    auto cov = matmult(m_centered_transpose,m_centered);//cols*cols
+    for(int i=0;i<cols;i++){
     for(int j=0;j<cols;j++){
     cov[i][j]=cov[i][j]/(rows-1);
     }
@@ -391,6 +391,7 @@ vector<vector<double>> get_covariance(vector<vector<double>> &m){
 //D = power*identity matrix(diagonal matrix with the eigenvalue 
 //raised to the power as the only value)
 //U^T = Transpose of U
+//only will work for square matrices
 vector<vector<double>> mat_power  (vector<vector<double>> &m,  double power){
 
     int rows = m.size();
@@ -614,137 +615,47 @@ double calculate_auc(vector<double>&probs,vector<int>&actual_labels){
   
 int main(){
 
-    cout<<"hello"<<endl;
+    cout<<"------CORAL----- "<<endl;
 
     vector<vector<double>> source;
     vector<vector<double>> target;
-
     vector<int>source_labels;
     vector<int>target_labels;
 
 
     string filename = "datasets/A.csv";
     load_dataset(filename,source,source_labels);
-
-
-    string filename2 ="datasets/Z.csv";
+    string filename2 ="datasets/S.csv";
     load_dataset(filename2,target,target_labels);
 
-
-    auto stk=stacking(source,target); //20*10
-
-    z_score_normalize(stk);
-
-    cout<<"before mmd"<<endl;
-
-    double mmd_before = calculate_mmd(stk,source.size(),target.size());
-    cout << "\n------------------------------------------------" << endl;
-    cout << "MMD Distance (Original Data): " << mmd_before << endl;
-    cout << "------------------------------------------------" << endl;
-
-    cout<<"after mmd"<<endl;
-
-    auto K=kernel(stk); //(20*10).(10*20)=(20*20) 
-
-    int m = K.size();
-
-    auto H = Centering(K);
-    auto tmp =matmult(H,K);
-    auto kc = matmult(tmp,H); 
-
-    // auto L = weighting_mat(K,source,target);
-    // auto tmp2 = matmult(K,L);
-    // auto kl = matmult(tmp2,K);
-    //see line 800
-
-    vector<vector<double>>muI(m,vector<double>(m));
-
-    for(int i=0;i<m;i++){
-        for(int j=0;j<m;j++){
-            if(i==j){
-                muI[i][j] =reg;
-            }
-        }
-    }
-    
-   
+    z_score_normalize(source);
+    z_score_normalize(target);
 
 
-//---------BDA SETUP-------------
-
-
-    double mu = 0.5;
-    int iterations = 10;
-
-
-    vector<int>pseudo_labels;
-
-    for(int i=0;i<target.size();i++){
-        int pred = knn_predict(source,source_labels,target[i],1);
-        pseudo_labels.push_back(pred);
-    }
-
-    auto M0 = weighting_mat(K,source,target);
-
-    vector<vector<double>> Z; 
-    vector<vector<double>> train_data;
-    vector<vector<double>> test_data;
-
-
-    for(int itr=0;itr<iterations;itr++){
-
-        auto Mc_clean = conditional_weighting_mat(m,source.size(),target.size(),source_labels,pseudo_labels,0);
-        auto Mc_buggy = conditional_weighting_mat(m,source.size(),target.size(),source_labels,pseudo_labels,1);
+    auto covariance_source = get_covariance(source);
+    auto covariance_target = get_covariance(target);
+    //Regularize (Add Identity matrix so no eigenvalue is absolutely zero)
+    int d = source[0].size();
+    vector<vector<double>> I(d, vector<double>(d, 0.0));
+    for(int i=0; i<d; i++) I[i][i] = 1.0; 
+    covariance_source = matadd(covariance_source, I);
+    covariance_target = matadd(covariance_target, I);
 
 
 
-        auto Mc_combined = matadd(Mc_clean, Mc_buggy);
-        auto part1 = mat_scalar_mult(M0, 1.0-mu);
-        auto part2 = mat_scalar_mult(Mc_combined, mu);
-        auto M_final = matadd(part1, part2);
 
 
-        auto tmp2 = matmult(K,M_final);
-        auto kl = matmult(tmp2,K);
+    //data whitening 
+    auto cs_inverse_half = mat_power(covariance_source,-0.5);
+    //data recoloring
+    auto ct_half = mat_power(covariance_target, 0.5);
+    //A = Cs^(-1/2) * Ct^(1/2)
+    auto A = matmult(cs_inverse_half,ct_half);
 
 
-        auto distance = matadd(kl, muI);
-        auto structure = kc; // kc was calculated above the loop!
-        auto W = matmult(mat_inverse(distance), structure);
 
-        auto eigen_pairs = eigen_starter(W); 
-        eigen_pairs = pair_sort(eigen_pairs);
+    auto source_aligned = matmult(source,A);
 
-        vector<vector<double>> W_matrix(m, vector<double>(dim));
-        for(int i=0; i<m; i++){
-            for(int j=0; j<dim; j++){
-                W_matrix[i][j] = eigen_pairs[j].second[i];
-            }
-        }
-
-        // d. Project the data
-        Z = matmult(K, W_matrix);
-
-        // e. Split Z back into Train and Test
-        train_data.clear();
-        test_data.clear();
-        for(int i=0; i<source.size(); i++) train_data.push_back(Z[i]);
-        for(int i=source.size(); i<Z.size(); i++) test_data.push_back(Z[i]);
-
-        // f. Update Pseudo-Labels for the NEXT iteration
-        for(int i=0; i<test_data.size(); i++){
-            pseudo_labels[i] = knn_predict(train_data, source_labels, test_data[i], 1);
-        }
-        
-        cout << "Completed BDA Iteration: " << itr+1 << endl;
-    }
-
-
-    
-    double mmd_after = calculate_mmd(Z, source.size(), target.size());
-    cout << "\n------------------------------------------------" << endl;
-    cout << "MMD Distance (After BDA): " << mmd_after << endl;
-    cout << "------------------------------------------------" << endl;
 
 
 
@@ -752,13 +663,13 @@ int main(){
     int true_pos = 0, true_neg = 0, false_pos = 0, false_neg = 0;
     vector<double> prob_scores; 
 
-    // Test using the FINAL latents space (Z) after 10 iterations
-    for(int i=0; i<test_data.size(); i++){
+    // Test the Target data against the newly Aligned Source data
+    for(int i=0; i<target.size(); i++){
         int actual = target_labels[i];
         
-        // Using k=3 for final evaluation 
-        int predicted = knn_predict(train_data, source_labels, test_data[i], 3);
-        double prob = get_knn_prob(train_data, source_labels, test_data[i], 3);
+        // We use K=3 for standard evaluation
+        int predicted = knn_predict(source_aligned, source_labels, target[i], 3);
+        double prob = get_knn_prob(source_aligned, source_labels, target[i], 3);
         
         prob_scores.push_back(prob);
 
@@ -768,14 +679,14 @@ int main(){
         if(predicted==0 && actual==1) false_neg++;
     }
 
-    double accuracy = (double)(true_pos + true_neg) / test_data.size() * 100.0;
+    double accuracy = (double)(true_pos + true_neg) / target.size() * 100.0;
     double precision = (true_pos + false_pos) > 0 ? (double)true_pos / (true_pos + false_pos) : 0.0;
     double recall = (true_pos + false_neg) > 0 ? (double)true_pos / (true_pos + false_neg) : 0.0;
     double f1 = (precision + recall) > 0 ? 2.0 * (precision * recall) / (precision + recall) : 0.0;
     double auc = calculate_auc(prob_scores, target_labels);
 
     cout << "------------------------------------------------" << endl;
-    cout << "FINAL RESULTS (BDA + KNN)" << endl;
+    cout << "FINAL RESULTS (CORAL + KNN)" << endl;
     cout << "------------------------------------------------" << endl;
     cout << "Accuracy:  " << accuracy << "%" << endl;
     cout << "Precision: " << precision << endl;
@@ -784,7 +695,8 @@ int main(){
     cout << "AUC:       " << auc << endl;
     cout << "------------------------------------------------" << endl;
 
-    return 0; // End of main()
+    return 0;
+
 
 
 }
