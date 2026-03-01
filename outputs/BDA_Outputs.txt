@@ -1,0 +1,227 @@
+mu = 0.1
+datasets/A.csv ----> datasets/S.csv
+
+
+MMD before applying BDA :
+
+------------------------------------------------
+MMD Distance (Original Data): 2.92501
+------------------------------------------------
+MMD after applying BDA :
+Completed BDA Iteration: 1 | Label changes: 26
+Completed BDA Iteration: 2 | Label changes: 19
+Completed BDA Iteration: 3 | Label changes: 6
+Completed BDA Iteration: 4 | Label changes: 15
+Completed BDA Iteration: 5 | Label changes: 14
+Completed BDA Iteration: 6 | Label changes: 9
+Completed BDA Iteration: 7 | Label changes: 21
+Completed BDA Iteration: 8 | Label changes: 22
+Completed BDA Iteration: 9 | Label changes: 10
+Completed BDA Iteration: 10 | Label changes: 9
+
+------------------------------------------------
+MMD Distance (After BDA): 0.146264
+------------------------------------------------
+------------------------------------------------
+FINAL RESULTS (BDA + KNN)
+------------------------------------------------
+AUC:       0.498663
+------------------------------------------------
+
+
+
+datasets/A.csv ----> datasets/Z.csv
+
+MMD before applying BDA :
+
+------------------------------------------------
+MMD Distance (Original Data): 4.65585
+------------------------------------------------
+MMD after applying BDA :
+Completed BDA Iteration: 1 | Label changes: 148
+Completed BDA Iteration: 2 | Label changes: 98
+Completed BDA Iteration: 3 | Label changes: 94
+Completed BDA Iteration: 4 | Label changes: 126
+Completed BDA Iteration: 5 | Label changes: 110
+Completed BDA Iteration: 6 | Label changes: 108
+Completed BDA Iteration: 7 | Label changes: 106
+Completed BDA Iteration: 8 | Label changes: 116
+Completed BDA Iteration: 9 | Label changes: 99
+Completed BDA Iteration: 10 | Label changes: 97
+
+------------------------------------------------
+MMD Distance (After BDA): 0.0452144
+------------------------------------------------
+------------------------------------------------
+FINAL RESULTS (BDA + KNN)
+------------------------------------------------
+AUC:       0.484423
+------------------------------------------------
+
+
+
+
+
+
+datasets/S.csv ----> datasets/Z.csv
+
+
+
+
+MMD before applying BDA :
+
+------------------------------------------------
+MMD Distance (Original Data): 2.92501
+------------------------------------------------
+MMD after applying BDA :
+Completed BDA Iteration: 1 | Label changes: 81
+Completed BDA Iteration: 2 | Label changes: 54
+Completed BDA Iteration: 3 | Label changes: 55
+Completed BDA Iteration: 4 | Label changes: 59
+Completed BDA Iteration: 5 | Label changes: 63
+Completed BDA Iteration: 6 | Label changes: 46
+Completed BDA Iteration: 7 | Label changes: 49
+Completed BDA Iteration: 8 | Label changes: 59
+Completed BDA Iteration: 9 | Label changes: 57
+Completed BDA Iteration: 10 | Label changes: 48
+
+------------------------------------------------
+MMD Distance (After BDA): 0.0803774
+------------------------------------------------
+------------------------------------------------
+FINAL RESULTS (BDA + KNN)
+------------------------------------------------
+AUC:       0.671609
+------------------------------------------------
+
+
+
+datasets/S.csv ----> datasets/A.csv
+
+
+
+
+
+
+
+MMD before applying BDA :
+
+------------------------------------------------
+MMD Distance (Original Data): 2.87293
+------------------------------------------------
+MMD after applying BDA :
+Completed BDA Iteration: 1 | Label changes: 155
+Completed BDA Iteration: 2 | Label changes: 114
+Completed BDA Iteration: 3 | Label changes: 158
+Completed BDA Iteration: 4 | Label changes: 145
+Completed BDA Iteration: 5 | Label changes: 138
+Completed BDA Iteration: 6 | Label changes: 157
+Completed BDA Iteration: 7 | Label changes: 131
+Completed BDA Iteration: 8 | Label changes: 55
+Completed BDA Iteration: 9 | Label changes: 123
+Completed BDA Iteration: 10 | Label changes: 110
+
+------------------------------------------------
+MMD Distance (After BDA): 0.0245552
+------------------------------------------------
+------------------------------------------------
+FINAL RESULTS (BDA + KNN)
+------------------------------------------------
+AUC:       0.580343
+------------------------------------------------
+
+
+
+datasets/Z.csv ----> datasets/S.csv
+
+
+
+
+
+
+
+
+
+
+MMD before applying BDA :
+
+------------------------------------------------
+MMD Distance (Original Data): 4.65585
+------------------------------------------------
+MMD after applying BDA :
+Completed BDA Iteration: 1 | Label changes: 81
+Completed BDA Iteration: 2 | Label changes: 74
+Completed BDA Iteration: 3 | Label changes: 58
+Completed BDA Iteration: 4 | Label changes: 69
+Completed BDA Iteration: 5 | Label changes: 59
+Completed BDA Iteration: 6 | Label changes: 64
+Completed BDA Iteration: 7 | Label changes: 71
+Completed BDA Iteration: 8 | Label changes: 70
+Completed BDA Iteration: 9 | Label changes: 53
+Completed BDA Iteration: 10 | Label changes: 47
+
+------------------------------------------------
+MMD Distance (After BDA): 0.0101056
+------------------------------------------------
+------------------------------------------------
+FINAL RESULTS (BDA + KNN)
+------------------------------------------------
+AUC:       0.554953
+------------------------------------------------
+
+
+
+
+
+
+datasets/Z.csv ----> datasets/A.csv
+
+
+
+
+
+MMD before applying BDA :
+
+------------------------------------------------
+MMD Distance (Original Data): 2.87293
+------------------------------------------------
+MMD after applying BDA :
+Completed BDA Iteration: 1 | Label changes: 20
+Completed BDA Iteration: 2 | Label changes: 16
+Completed BDA Iteration: 3 | Label changes: 11
+Completed BDA Iteration: 4 | Label changes: 10
+Completed BDA Iteration: 5 | Label changes: 18
+Completed BDA Iteration: 6 | Label changes: 20
+Completed BDA Iteration: 7 | Label changes: 15
+Completed BDA Iteration: 8 | Label changes: 21
+Completed BDA Iteration: 9 | Label changes: 21
+Completed BDA Iteration: 10 | Label changes: 19
+
+------------------------------------------------
+MMD Distance (After BDA): 0.150199
+------------------------------------------------
+------------------------------------------------
+FINAL RESULTS (BDA + KNN)
+------------------------------------------------
+AUC:       0.638369
+------------------------------------------------
+
+
+
+
+
+//BDA AUC comparison
+
+A → S: 0.498663 | 0.555
+A → Z: 0.484423 | 0.484
+S → Z: 0.671609 | 0.635
+S → A: 0.580343 | 0.611
+Z → S: 0.554953 | 0.627
+Z → A: 0.638369 | 0.632
+
+
+
+
+
+
+

@@ -1,0 +1,240 @@
+-------------------BDA Outputs------------------------------
+
+
+1.A-S
+
+------------------------------------------------
+MMD Distance (Original Data): 2.92501
+------------------------------------------------
+after mmd
+Completed BDA Iteration: 1
+Completed BDA Iteration: 2
+Completed BDA Iteration: 3
+Completed BDA Iteration: 4
+Completed BDA Iteration: 5
+Completed BDA Iteration: 6
+Completed BDA Iteration: 7
+Completed BDA Iteration: 8
+Completed BDA Iteration: 9
+Completed BDA Iteration: 10
+
+------------------------------------------------
+MMD Distance (After BDA): 0.0837134
+------------------------------------------------
+------------------------------------------------
+FINAL RESULTS (BDA + KNN)
+------------------------------------------------
+Accuracy:  60.7143%
+Precision: 0.5
+Recall:    0.454545
+F1-Score:  0.47619
+AUC:       0.631016
+------------------------------------------------
+
+
+
+
+
+
+
+
+
+2.A_Z
+
+
+------------------------------------------------
+MMD Distance (Original Data): 4.65585
+------------------------------------------------
+after mmd
+Completed BDA Iteration: 1
+Completed BDA Iteration: 2
+Completed BDA Iteration: 3
+Completed BDA Iteration: 4
+Completed BDA Iteration: 5
+Completed BDA Iteration: 6
+Completed BDA Iteration: 7
+Completed BDA Iteration: 8
+Completed BDA Iteration: 9
+Completed BDA Iteration: 10
+
+------------------------------------------------
+MMD Distance (After BDA): 0.366257
+------------------------------------------------
+------------------------------------------------
+FINAL RESULTS (BDA + KNN)
+------------------------------------------------
+Accuracy:  60.9023%
+Precision: 0.317308
+Recall:    0.279661
+F1-Score:  0.297297
+AUC:       0.511506
+------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+3.S_A
+
+
+
+
+------------------------------------------------
+MMD Distance (Original Data): 2.92501
+------------------------------------------------
+after mmd
+Completed BDA Iteration: 1
+Completed BDA Iteration: 2
+Completed BDA Iteration: 3
+Completed BDA Iteration: 4
+Completed BDA Iteration: 5
+Completed BDA Iteration: 6
+Completed BDA Iteration: 7
+Completed BDA Iteration: 8
+Completed BDA Iteration: 9
+Completed BDA Iteration: 10
+
+------------------------------------------------
+MMD Distance (After BDA): 0.188183
+------------------------------------------------
+------------------------------------------------
+FINAL RESULTS (BDA + KNN)
+------------------------------------------------
+Accuracy:  65.9794%
+Precision: 0.742424
+Recall:    0.5
+F1-Score:  0.597561
+AUC:       0.687234
+------------------------------------------------
+
+
+
+
+
+
+
+
+4.S_Z
+
+
+------------------------------------------------
+MMD Distance (Original Data): 2.87293
+------------------------------------------------
+after mmd
+Completed BDA Iteration: 1
+Completed BDA Iteration: 2
+Completed BDA Iteration: 3
+Completed BDA Iteration: 4
+Completed BDA Iteration: 5
+Completed BDA Iteration: 6
+Completed BDA Iteration: 7
+Completed BDA Iteration: 8
+Completed BDA Iteration: 9
+Completed BDA Iteration: 10
+
+------------------------------------------------
+MMD Distance (After BDA): 0.359986
+------------------------------------------------
+------------------------------------------------
+FINAL RESULTS (BDA + KNN)
+------------------------------------------------
+Accuracy:  60.9023%
+Precision: 0.324074
+Recall:    0.29661
+F1-Score:  0.309735
+AUC:       0.504931
+------------------------------------------------
+
+
+
+
+
+
+
+5.Z_A
+
+
+------------------------------------------------
+MMD Distance (Original Data): 4.65585
+------------------------------------------------
+after mmd
+Completed BDA Iteration: 1
+Completed BDA Iteration: 2
+Completed BDA Iteration: 3
+Completed BDA Iteration: 4
+Completed BDA Iteration: 5
+Completed BDA Iteration: 6
+Completed BDA Iteration: 7
+Completed BDA Iteration: 8
+Completed BDA Iteration: 9
+Completed BDA Iteration: 10
+
+------------------------------------------------
+MMD Distance (After BDA): 0.0172485
+------------------------------------------------
+------------------------------------------------
+FINAL RESULTS (BDA + KNN)
+------------------------------------------------
+Accuracy:  55.6701%
+Precision: 0.625
+Recall:    0.306122
+F1-Score:  0.410959
+AUC:       0.610757
+------------------------------------------------
+
+
+
+
+
+
+
+6.Z_S
+
+
+
+------------------------------------------------
+MMD Distance (Original Data): 2.87293
+------------------------------------------------
+after mmd
+Completed BDA Iteration: 1
+Completed BDA Iteration: 2
+Completed BDA Iteration: 3
+Completed BDA Iteration: 4
+Completed BDA Iteration: 5
+Completed BDA Iteration: 6
+Completed BDA Iteration: 7
+Completed BDA Iteration: 8
+Completed BDA Iteration: 9
+Completed BDA Iteration: 10
+------------------------------------------------
+FINAL RESULTS (BDA + KNN)
+------------------------------------------------
+Accuracy:  60.7143%
+Precision: 0.5
+Recall:    0.181818
+F1-Score:  0.266667
+AUC:       0.608289
+------------------------------------------------
+
+
+A → S: 0.631016   | 0.540
+                  |
+A → Z: 0.511506   | 0.511
+                  |
+S → A: 0.687234   | 0.640
+                  |
+S → Z: 0.504931   | 0.618
+                  |
+Z → A: 0.610757   | 0.652
+                  |
+Z → S: 0.608289   | 0.738
+
+----------------------------------------------
+
+
+
