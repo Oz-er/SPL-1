@@ -517,39 +517,6 @@ bool compareDist(const pair<int,double>&a,const pair<int,double>&b){
 }
 
 
-int knn_predict(vector<vector<double>> &train, vector<int>&train_labels, vector<double>&test_sample, int k){
-
-    vector<pair<int,double>> distances;
-
-    int train_rows = train.size();
-    int cols = train[0].size();
-
-    for(int i=0;i<train_rows;i++){
-        double d= get_distance(train[i],test_sample);
-        distances.push_back({i,d});
-    }
-
-
-    sort(distances.begin(),distances.end(),compareDist);
-
-
-    int vote0 = 0;
-    int vote1 = 0;
-
-    for (int i = 0; i < k; i++) {
-        int neighbor_index = distances[i].first;
-        int label = train_labels[neighbor_index];
-
-        if (label == 0) vote0++;
-        else vote1++;
-    }
-
-    // 4. Majority Rule
-    if (vote1 > vote0) return 1;
-    else return 0;
-
-}
-
 double get_knn_prob(vector<vector<double>> &train, vector<int>&train_labels, vector<double>&test_sample, int k){
 
     vector<pair<int,double>>distances;
@@ -623,9 +590,9 @@ int main(){
     vector<int>target_labels;
 
 
-    string filename = "datasets/A.csv";
+    string filename = "datasets/Z.csv";
     load_dataset(filename,source,source_labels);
-    string filename2 ="datasets/S.csv";
+    string filename2 ="datasets/A.csv";
     load_dataset(filename2,target,target_labels);
 
     z_score_normalize(source);
@@ -668,9 +635,9 @@ int main(){
         int actual = target_labels[i];
         
         // We use K=3 for standard evaluation
-        int predicted = knn_predict(source_aligned, source_labels, target[i], 3);
-        double prob = get_knn_prob(source_aligned, source_labels, target[i], 3);
-        
+        // int predicted = knn_predict(source_aligned, source_labels, target[i], 1);
+        double prob = get_knn_prob(source_aligned, source_labels, target[i], 1);
+        int predicted = (prob > 0.5) ? 1 : 0;
         prob_scores.push_back(prob);
 
         if(predicted==1 && actual==1) true_pos++;
