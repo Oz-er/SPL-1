@@ -1,0 +1,1 @@
+/usr/bin/c++  -O3 -Wl,--dependency-file=CMakeFiles/DomainAdaption.dir/link.d CMakeFiles/DomainAdaption.dir/Main.cpp.o CMakeFiles/DomainAdaption.dir/TCA.cpp.o CMakeFiles/DomainAdaption.dir/BDA.cpp.o CMakeFiles/DomainAdaption.dir/CORAL.cpp.o -o DomainAdaption

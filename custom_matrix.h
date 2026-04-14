@@ -3,9 +3,10 @@
 
 #include<vector>
 #include<utility>
+#include<cmath>
+#include<iostream>
 
-
-std::pair<int,int> get_rowcol(std::vector<std::vector<double>> &v){
+inline std::pair<int,int> get_rowcol(std::vector<std::vector<double>> &v){
 
     if(v.empty()){
         return {0,0};
@@ -16,7 +17,7 @@ std::pair<int,int> get_rowcol(std::vector<std::vector<double>> &v){
 
 
 
-std::vector<double> getcolumn (std::vector<std::vector<double>> &m , int col){
+inline std::vector<double> getcolumn (std::vector<std::vector<double>> &m , int col){
     
     std::pair<int,int>a;
 
@@ -33,7 +34,7 @@ std::vector<double> getcolumn (std::vector<std::vector<double>> &m , int col){
 
 
 
-std::vector<std::vector<double>> mat_scalar_mult(std::vector<std::vector<double>> &mat, double scalar){
+inline std::vector<std::vector<double>> mat_scalar_mult(std::vector<std::vector<double>> &mat, double scalar){
     int rows = mat.size();
     int cols = mat[0].size();
     std::vector<std::vector<double>> result(rows,std::vector<double>(cols));
@@ -48,7 +49,7 @@ std::vector<std::vector<double>> mat_scalar_mult(std::vector<std::vector<double>
 
 
 
-std::vector<std::vector<double>> matmult(const std::vector<std::vector<double>> &a,const std::vector<std::vector<double>> &b){
+inline std::vector<std::vector<double>> matmult(const std::vector<std::vector<double>> &a,const std::vector<std::vector<double>> &b){
 
     if(a.empty() || b.empty())return{};
 
@@ -74,7 +75,7 @@ std::vector<std::vector<double>> matmult(const std::vector<std::vector<double>> 
 
 
 
-std::vector<std::vector<double>>  transpose(std::vector<std::vector<double>> &mat){
+inline std::vector<std::vector<double>>  transpose(std::vector<std::vector<double>> &mat){
     int rows=mat.size();
     int cols=mat[0].size();
 
@@ -93,7 +94,7 @@ std::vector<std::vector<double>>  transpose(std::vector<std::vector<double>> &ma
 
 
 
-std::vector<double> getrow (std::vector<std::vector<double>> &m , int row){
+inline std::vector<double> getrow (std::vector<std::vector<double>> &m , int row){
     
     int n = m.size();
     std::vector<double> v(n);
@@ -110,7 +111,7 @@ std::vector<double> getrow (std::vector<std::vector<double>> &m , int row){
 
 
 
-void setcolumn (std:: vector<std:: vector<double>> &m , std::vector<double> &v, int col){
+inline void setcolumn (std:: vector<std:: vector<double>> &m , std::vector<double> &v, int col){
     
     int n = m.size();
     for(int i=0;i<n;i++){
@@ -120,7 +121,7 @@ void setcolumn (std:: vector<std:: vector<double>> &m , std::vector<double> &v, 
 }
 
 
-std::vector<std::vector<double>>matadd(std::vector<std::vector<double>> &a,std::vector<std::vector<double>> &b){
+inline std::vector<std::vector<double>>matadd(std::vector<std::vector<double>> &a,std::vector<std::vector<double>> &b){
     int rows=a.size();
     int cols=a[0].size();
 
@@ -136,7 +137,7 @@ std::vector<std::vector<double>>matadd(std::vector<std::vector<double>> &a,std::
 }
 
 
-std::vector<std::vector<double>> mat_inverse(std::vector<std::vector<double>>mat){
+inline std::vector<std::vector<double>> mat_inverse(std::vector<std::vector<double>>mat){
 
     //creating the identity
 
