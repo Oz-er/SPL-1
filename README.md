@@ -14,5 +14,5 @@ This project implements **Transfer Learning** algorithms to align these distribu
 
 **Key Algorithms Implemented:**
 * **TCA (Transfer Component Analysis):** Minimizes the Maximum Mean Discrepancy (MMD) between domains in a latent kernel space.
-* **BDA (Balanced Distribution Adaptation):** *(Planned)* Extends TCA to balance marginal and conditional distributions.
-* **CORAL (Correlation Alignment):** *(Planned)* Aligns the second-order statistics (covariance) of the source and target.
+* **BDA (Balanced Distribution Adaptation):** Extends TCA to balance marginal and conditional distributions.
+* **CORAL (Correlation Alignment):**  Aligns the second-order statistics (covariance) of the source and target.
