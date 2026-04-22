@@ -9,22 +9,18 @@ void run_bda(vector<vector<double>>& source, vector<int>& source_labels,
              vector<vector<double>>& target, vector<int>& target_labels) {
     
     cout << "\n--- Running BDA ---" << endl;
-    double reg = 0.1; 
-
+    double reg = 1; 
 
 
     auto stk=stacking(source,target); //20*10
 
     z_score_normalize(stk);
 
-    cout<<"MMD before applying BDA : "<<endl;
-
     double mmd_before = calculate_mmd(stk,source.size(),target.size());
     cout << "\n------------------------------------------------" << endl;
     cout << "MMD Distance (Original Data): " << mmd_before << endl;
     cout << "------------------------------------------------" << endl;
 
-    cout<<"MMD after applying BDA : "<<endl;
 
     auto K=kernel(stk); //(20*10).(10*20)=(20*20) 
 
@@ -52,7 +48,7 @@ void run_bda(vector<vector<double>>& source, vector<int>& source_labels,
    
 
 
-//---------BDA SETUP-------------
+//------------------------------------------ BDA SETUP ---------------------------------------------------------
 
 
     double mu = 0.1;
@@ -73,11 +69,13 @@ void run_bda(vector<vector<double>>& source, vector<int>& source_labels,
     vector<vector<double>> test_data;
 
 
+
+//------------------------------------------BDA ITERATIONS--------------------------------------------------------
+
+
+
+
     for(int itr=0;itr<iterations;itr++){
-
-
-  
-
 
         auto Mc_clean = conditional_weighting_mat(m,source.size(),target.size(),source_labels,pseudo_labels,0);
         auto Mc_buggy = conditional_weighting_mat(m,source.size(),target.size(),source_labels,pseudo_labels,1);
@@ -108,16 +106,13 @@ void run_bda(vector<vector<double>>& source, vector<int>& source_labels,
             }
         }
 
-        // d. Project the data
         Z = matmult(K, W_matrix);
 
-        // e. Split Z back into Train and Test
         train_data.clear();
         test_data.clear();
         for(int i=0; i<source.size(); i++) train_data.push_back(Z[i]);
         for(int i=source.size(); i<Z.size(); i++) test_data.push_back(Z[i]);
 
-        // f. Update Pseudo-Labels for the NEXT iteration
 
 
         int changes = 0;
@@ -129,8 +124,7 @@ void run_bda(vector<vector<double>>& source, vector<int>& source_labels,
         }
 
 
-        cout << "Completed BDA Iteration: " << itr+1 
-         << " | Label changes: " << changes << endl;    
+        cout << "Completed BDA Iteration: " << itr+1 << endl;    
 
 
         if(changes == 0) {
@@ -145,45 +139,58 @@ void run_bda(vector<vector<double>>& source, vector<int>& source_labels,
     double mmd_after = calculate_mmd(Z, source.size(), target.size());
     cout << "\n------------------------------------------------" << endl;
     cout << "MMD Distance (After BDA): " << mmd_after << endl;
-    cout << "------------------------------------------------" << endl;
 
 
+//-----------------------------------EVALUATION--------------------------------------------------
 
-    // --- FINAL EVALUATION ---
+    int k_neighbors= 1;
+    
     int true_pos = 0, true_neg = 0, false_pos = 0, false_neg = 0;
     vector<double> prob_scores; 
 
-    // Test using the FINAL latents space (Z) after 10 iterations
-    for(int i=0; i<test_data.size(); i++){
+     ofstream outfile("BDA_predictions.csv");
+    outfile << "Actual_Label,Predicted_Label,Probability_Score\n"; 
+
+    for(int i=0;i<test_data.size();i++){
         int actual = target_labels[i];
-        
-        // Using k=3 for final evaluation 
-        int predicted = knn_predict(train_data, source_labels, test_data[i], 3);
-        double prob = get_knn_prob(train_data, source_labels, test_data[i], 3);
+
+        int predicted = knn_predict(train_data,source_labels,test_data[i],k_neighbors);
+        double prob = get_knn_prob(train_data, source_labels, test_data[i], k_neighbors);
         
         prob_scores.push_back(prob);
 
-        if(predicted==1 && actual==1) true_pos++;
-        if(predicted==0 && actual==0) true_neg++;
-        if(predicted==1 && actual==0) false_pos++;
-        if(predicted==0 && actual==1) false_neg++;
+        outfile << actual << "," << predicted << "," << prob << "\n";
+
+        if(predicted==1 && actual ==1)true_pos++;
+        if(predicted==0 && actual ==0)true_neg++;
+        if(predicted==1 && actual ==0)false_pos++;
+        if(predicted==0 && actual ==1)false_neg++;
     }
 
+    outfile.close();
+
+
+
     double accuracy = (double)(true_pos + true_neg) / test_data.size() * 100.0;
+
     double precision = (true_pos + false_pos) > 0 ? (double)true_pos / (true_pos + false_pos) : 0.0;
+    
     double recall = (true_pos + false_neg) > 0 ? (double)true_pos / (true_pos + false_neg) : 0.0;
-    double f1 = (precision + recall) > 0 ? 2.0 * (precision * recall) / (precision + recall) : 0.0;
+    
     double auc = calculate_auc(prob_scores, target_labels);
 
-    cout << "------------------------------------------------" << endl;
+    double mmd_change_pct = 0.0;
+    if (mmd_before != 0) {
+        mmd_change_pct = ((mmd_before - mmd_after) / mmd_before) * 100.0;
+    }
+
     cout << "FINAL RESULTS (BDA + KNN)" << endl;
     cout << "------------------------------------------------" << endl;
-    // cout << "Accuracy:  " << accuracy << "%" << endl;
-    // cout << "Precision: " << precision << endl;
-    // cout << "Recall:    " << recall << endl;
-    // cout << "F1-Score:  " << f1 << endl;
-    cout << "AUC:       " << auc << endl;
+    cout << "MMD Change: " << mmd_change_pct << "%" << endl; 
+    cout << "AUC:        " << auc << endl;
+    cout << "Precision:  " << precision << endl;
+    cout << "Recall:     " << recall << endl;
+    cout << ">>> Predicted labels successfully saved to: BDA_predictions.csv" << endl;
     cout << "------------------------------------------------" << endl;
-
 
 }

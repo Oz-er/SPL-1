@@ -9,7 +9,7 @@
 #include <algorithm>
 #include "custom_matrix.h"
 
-#define iter 100
+#define iter 20
 #define dim 5
 
 using namespace std;
@@ -834,11 +834,11 @@ inline double calculate_auc(vector<double>&probs,vector<int>&actual_labels){
 
     // Compare every Positive vs Negative sample
     for(double p_score : pos_scores) {
-        for(double n_score : neg_scores) {
-            total_pairs++;
-            if(p_score > n_score) valid_pairs += 1.0;       // Correct ranking (Bug score > Clean score)
-            else if(p_score == n_score) valid_pairs += 0.5; // Tie
-        }
+    for(double n_score : neg_scores) {
+        total_pairs++;
+        if(p_score > n_score) valid_pairs += 1.0;       // Correct ranking (Bug score > Clean score)
+        else if(p_score == n_score) valid_pairs += 0.5; // Tie
+    }
     }
 
     return valid_pairs / total_pairs;
