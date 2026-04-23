@@ -23,6 +23,10 @@ void run_tca(vector<vector<double>>& source, vector<int>& source_labels,
 
 
 
+//----------------------------------------------------------------------------
+//------------ solves the generalized eigenvalue eqn--------------------------
+//----------------------------------------------------------------------------
+
     auto K=kernel(stk); //(20*10).(10*20)=(20*20) 
     int m = K.size();
     auto H = Centering(K);
@@ -32,9 +36,7 @@ void run_tca(vector<vector<double>>& source, vector<int>& source_labels,
     auto tmp2 = matmult(K,L);
     auto kl = matmult(tmp2,K);
 
-    
     vector<vector<double>>muI(m,vector<double>(m));
-
     for(int i=0;i<m;i++){
     for(int j=0;j<m;j++){
         if(i==j){
@@ -43,23 +45,25 @@ void run_tca(vector<vector<double>>& source, vector<int>& source_labels,
     }
     }
     
-
-
     auto distance = matadd(kl,muI);
     auto structure = kc;
-
-
     auto W = matmult(mat_inverse(distance),structure);
 
-    // cout<<"1 done"<<endl;
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+
+
+
+
+
+
+//----------------------------------------------------------------------------
+//----------- capturing the top K eigenvectors -------------------------------
+//----------------------------------------------------------------------------
 
     auto eigen_pairs = eigen_starter(W); 
     eigen_pairs = pair_sort(eigen_pairs);
-
-
-    // cout<<"2 done"<<endl;
-
-
     m = K.size(); 
     vector<vector<double>>W_matrix(m,vector<double>(dim));
     
@@ -68,24 +72,30 @@ void run_tca(vector<vector<double>>& source, vector<int>& source_labels,
             W_matrix[i][j]=eigen_pairs[j].second[i];
         }
     }
-    // cout<<"3 done"<<endl;
+    auto Z = matmult(K,W_matrix);  // Z = contains only 5 best features
 
-    auto Z = matmult(K,W_matrix);
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
-    // cout<<"4 done"<<endl;
+
+
+
 
 
 
     double mmd_after = calculate_mmd(Z,source.size(),target.size());
     cout << "MMD Distance (Projected Data): " << mmd_after << endl;
 
-
-
     
     vector<vector<double>>train;
     vector<vector<double>>test;
 
 
+
+//---------------------------------------------------------------------------
+//---------------------- split the projected data ---------------------------
+//---------------------- into train and test --------------------------------
 
     for(int i=0;i<source.size();i++){
     train.push_back(Z[i]);
@@ -94,6 +104,12 @@ void run_tca(vector<vector<double>>& source, vector<int>& source_labels,
     for(int i=source.size();i<source.size()+target.size();i++){
     test.push_back(Z[i]);
     }
+
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+
+
 
     int k_neighbors=1;
 
@@ -111,7 +127,7 @@ void run_tca(vector<vector<double>>& source, vector<int>& source_labels,
         int actual = target_labels[i];
 
         int predicted = knn_predict(train,source_labels,test[i],k_neighbors);
-        double prob = get_knn_prob(train, source_labels, test[i], k_neighbors);
+        double prob = get_knn_prob(train, source_labels, test[i], k_neighbors); //for AUC only
         
         prob_scores.push_back(prob);
 
@@ -122,6 +138,9 @@ void run_tca(vector<vector<double>>& source, vector<int>& source_labels,
         if(predicted==1 && actual ==0)false_pos++;
         if(predicted==0 && actual ==1)false_neg++;
     }
+
+
+
 
     outfile.close();
 

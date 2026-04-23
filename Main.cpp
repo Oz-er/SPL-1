@@ -8,15 +8,14 @@ using namespace std;
 void load_datasets(string &source_file, string &target_file,
                    vector<vector<double>> &source, vector<vector<double>> &target,
                    vector<int> &source_labels, vector<int> &target_labels) {
-    cout << "Enter Source Dataset filename (e.g., ..datasets/A.csv): ";
+    cout << "Enter Source Dataset filename (e.g., ../datasets/A.csv): ";
     cin >> source_file;
-    cout << "Enter Target Dataset filename (e.g., ..datasets/Z.csv): ";
+    cout << "Enter Target Dataset filename (e.g., ../datasets/Z.csv): ";
     cin >> target_file;
 
     source.clear(); target.clear();
     source_labels.clear(); target_labels.clear();
 
-    cout << "\nLoading datasets..." << endl;
     load_dataset(source_file, source, source_labels);
     load_dataset(target_file, target, target_labels);
     cout << "Loaded Source (" << source.size() << " rows) and Target (" << target.size() << " rows).\n";
@@ -28,14 +27,13 @@ void load_datasets(string &source_file, string &target_file,
 
 
 
-
 int main() {
     string source_file, target_file;
     int choice;
 
-    cout << "========================================" << endl;
-    cout << "  DOMAIN ADAPTATION TEST ENVIRONMENT" << endl;
-    cout << "========================================" << endl;
+    cout << "======================================================" << endl;
+    cout << "       DOMAIN ADAPTATION TEST ENVIRONMENT" << endl;
+    cout << "======================================================" << endl;
 
     vector<vector<double>> source, target;
     vector<int> source_labels, target_labels;

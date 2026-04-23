@@ -763,31 +763,40 @@ inline int knn_predict(vector<vector<double>> &train, vector<int>&train_labels, 
     int train_rows = train.size();
     int cols = train[0].size();
 
+
+//-------------calculating the distance between-----------------
+//-------------this test row and every train row----------------
+//------------then sort for the shortest ones-------------------
     for(int i=0;i<train_rows;i++){
-        double d= get_distance(train[i],test_sample);
-        distances.push_back({i,d});
+    double d= get_distance(train[i],test_sample);
+    distances.push_back({i,d});
     }
-
-
     sort(distances.begin(),distances.end(),compareDist);
-
+//---------------------------------------------------------------
+//---------------------------------------------------------------
+//---------------------------------------------------------------
 
     int vote0 = 0;
     int vote1 = 0;
 
+
+//------------------ count the labels of the --------------------
+//----------------- nearest neighbors found above------------------
+
     for (int i = 0; i < k; i++) {
-        int neighbor_index = distances[i].first;
-        int label = train_labels[neighbor_index];
-
-        if (label == 0) vote0++;
-        else vote1++;
+    int neighbor_index = distances[i].first;
+    int label = train_labels[neighbor_index];
+    if (label == 0) vote0++;
+    else vote1++;
     }
-
+//----------------------------------------------------------------
     // 4. Majority Rule
     if (vote1 > vote0) return 1;
     else return 0;
 
 }
+
+
 
 inline double get_knn_prob(vector<vector<double>> &train, vector<int>&train_labels, vector<double>&test_sample, int k){
 
@@ -796,8 +805,8 @@ inline double get_knn_prob(vector<vector<double>> &train, vector<int>&train_labe
     int train_rows = train.size();
 
     for (int i = 0; i < train_rows; i++) {
-        double d = get_distance(train[i],test_sample);
-        distances.push_back({i,d});
+    double d = get_distance(train[i],test_sample);
+    distances.push_back({i,d});
     }
 
     sort(distances.begin(),distances.end(),compareDist);
@@ -805,10 +814,9 @@ inline double get_knn_prob(vector<vector<double>> &train, vector<int>&train_labe
     int vote1 = 0;
 
     for(int i=0;i<k;i++){
-        int neighbor_index = distances[i].first;
-
-        if(train_labels[neighbor_index]==1){
-            vote1++;
+    int neighbor_index = distances[i].first;
+    if(train_labels[neighbor_index]==1){
+        vote1++;
         }
     }
 
